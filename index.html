@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HPBFAKM</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: #C8C8C8;
+      font-family: sans-serif;
+      background:grey;
+      animation: blink 2s;
+      
+    }
+
+    #player, .wall {
+      position: absolute;
+      width: 100px;
+      height: 100px;
+    }
+
+    #player {
+      top: 0;
+      left: 500%;
+      transform: translateX(-10%);
+      cursor: pointer;
+    }
+
+    .wall {
+      width: 100px;
+      height: 100px;
+    }
+
+    h1, h2 {
+      text-align: left;
+      margin: 10px;
+    }
+    }
+    h1,  {
+      text-align: center;
+      margin: 100px;
+    }
+    #nickname-setup {
+      position: absolute;
+      top: 30%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: seashell;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+    #game {
+      display: none;
+    
+    }
+
+    input {
+      padding: 10px;
+      font-size: 16px;
+      width: 200px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-top: 10px;
+      cursor: pointer;
+      color: white;
+      background: black;
+    }
+    
+    #shop {
+      
+      height: 75px;
+      width: 75px;
+      position: left;
+
+
+      padding-right: 100%;
+      
+    }
+        @keyframes blink {
+      
+      100% {
+        opacity: 1;
+      }
+      20% {
+        
+        opacity: 0;
+      }
+    }
+        
+  </style>
+</head>
+<body>
+<div id="nickname-setup">
+  <h2>Enter player nickname..</h2>
+  <input type="text" id="nickname-input" placeholder="your nickname..">
+  <br>
+  <button onclick="startGame()">Go!</button>
+</div>
+
+<div id="game">
+  <h1 id="score">Score: 0</h1>
+  <h2>Nickname =  <span id="player-name"></span></h2>
+  <img src="https://i.postimg.cc/4djNsKYT/player.png" alt="player" id="player">
+  <img src="Shop.png" alt="shop=" id="shop" onclick="document.location='Shop.html'">
+</div>
+<audio autoplay src="hpbfakm_soundtrack.mp3"></audio>
+<script>
+  const nicknameInput = document.getElementById('nickname-input');
+  const nicknameDisplay = document.getElementById('player-name');
+  const scoreDisplay = document.getElementById('score');
+  const gameDiv = document.getElementById('game');
+  const nicknameDiv = document.getElementById('nickname-setup');
+  const player = document.getElementById("player");
+
+  let score = 0;
+  let walls = [];
+  const wallCount = 1;
+  let angle = 0;
+  let velocityY = 0.1;
+  const gravity = 0.1;
+  const jumpPower = -0.3;
+  let playerTop = 0;
+  let playerLeft = window.innerWidth / 2 - 50;
+  let isGameOver = false;
+  let animationFrameId = null;
+
+  window.onload = () => {
+    const savedNick = localStorage.getItem('nickname');
+    if (savedNick) {
+      nicknameDisplay.textContent = savedNick;
+      nicknameDiv.style.display = 'none';
+      gameDiv.style.display = 'block';
+      resetGameFull();
+    }
+  };
+
+  function startGame() {
+    const nick = nicknameInput.value.trim();
+    if (nick) {
+      localStorage.setItem('nickname', nick);
+      nicknameDisplay.textContent = nick;
+      nicknameDiv.style.display = 'none';
+      gameDiv.style.display = 'block';
+      resetGameFull();
+    } else {
+      alert('Please enter nickname!');
+    }
+  }
+
+  function spawnWalls() {
+    walls.forEach(w => w.remove());
+    walls = [];
+
+    for (let i = 0; i < wallCount; i++) {
+      const wall = document.createElement("img");
+      wall.src = "https://i.postimg.cc/cLd1xGL6/wall.png";
+      wall.className = "wall";
+
+      const randomX = Math.random() * (window.innerWidth - 100);
+      const randomY = Math.random() * (window.innerHeight - 200);
+
+      wall.style.left = `${randomX}px`;
+      wall.style.top = `${randomY}px`;
+
+      document.body.appendChild(wall);
+      walls.push(wall);
+    }
+  }
+
+
+  function isColliding(a, b) {
+    const r1 = a.getBoundingClientRect();
+    const r2 = b.getBoundingClientRect();
+    return !(
+      r1.bottom < r2.top ||
+      r1.top > r2.bottom ||
+      r1.right < r2.left ||
+      r1.left > r2.right
+    );
+  }
+
+
+  function updateScore() {
+    scoreDisplay.textContent = `Score = ${score}`;
+  }
+
+  
+  function resetScore() {
+    score = 0;
+    updateScore();
+  }
+
+
+  function resetPlayerPosition() {
+    playerTop = 0;
+    velocityY = 0;
+    playerLeft = window.innerWidth / 2 - 50;
+    player.style.left = `${playerLeft}px`;
+    player.style.top = `${playerTop}px`;
+  }
+
+
+  function resetGameFull() {
+    cancelAnimationFrame(animationFrameId);
+    resetScore();
+    resetPlayerPosition();
+    spawnWalls();
+    isGameOver = false;
+    animate();
+  }
+
+  function resetGameButKeepScore() {
+    resetPlayerPosition();
+    spawnWalls();
+  }
+
+  function jump() {
+    if (!isGameOver) {
+      velocityY = jumpPower;
+      playerLeft += 50;
+      if (playerLeft > window.innerWidth - 100) {
+        playerLeft = window.innerWidth - 100;
+      }
+    }
+  }
+
+  
+  document.addEventListener("click", jump);
+  document.addEventListener("touchstart", jump);
+
+  function animate() {
+    angle += 10;
+    player.style.transform = `translateX(-50%) rotate(${angle}deg)`;
+
+    velocityY += gravity;
+    playerTop += velocityY;
+    player.style.top = `${playerTop}px`;
+    player.style.left = `${playerLeft}px`;
+
+    for (let wall of walls) {
+      if (isColliding(player, wall)) {
+        isGameOver = true;
+        cancelAnimationFrame(animationFrameId);
+        setTimeout(() => {
+        
+          resetGameFull();
+        }, 100);
+        return;
+      }
+    }
+
+    if (playerTop > window.innerHeight - 100) {
+      score++;
+      updateScore();
+      resetGameButKeepScore();
+    }
+
+    if (!isGameOver) {
+      animationFrameId = requestAnimationFrame(animate);
+    }
+  }
+</script>
+
+</body>
+</html>
