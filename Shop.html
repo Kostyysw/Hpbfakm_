@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hpbfakm</title>
+  <style>
+    body {
+      text-align: center;
+      background: #FFF780;
+      padding: 50px;
+      animation: blink 3s;
+    }
+
+    img {
+     
+      padding: 1px;
+      border: 10px;
+      border-color: white;
+    }
+
+    #points {
+      color: black;
+      font-size: 24px;
+      
+    }
+
+
+    #jj {
+      color: black;
+    }
+
+    #sdf {
+      color: black;
+    }
+    
+    #back {
+    
+      height: 70px;
+      width: 70px;
+      padding: 90px;
+    }
+    
+    #hpbfakm {
+    
+      height: 45px;
+      width: 45px;
+      padding: 10px;
+    }
+    
+    @keyframes blink {
+      100% {
+        opacity: 1;
+      }
+      0% {
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <h1 id="sdf">Mining (Points) beta v1.0</h1>
+  <div id="points">0.00000000</div>
+    <img id="hpbfakm" src="hpbfakm_circle.png" alt="hpbfakm_logo">
+    <p id="jj">⚠ This is mining for a points, not for real money!</p>
+
+  <img src="back.png" alt="back_button" id="back" onclick="document.location='index.html'">
+  <script>
+    let points = 0.000000;
+
+    function updateValues() {
+      points += 0.0006;
+      document.getElementById("points").textContent = points.toFixed(9);
+    }
+
+    setInterval(updateValues, 2000);
+    
+  window.onload = () => {
+    const savedPoints = localStorage.getItem('points');
+
+    const pointsDisplay = document.getElementById('points');
+    const pointsDiv = document.getElementById('pointsDiv'); // optional
+    const gameDiv = document.getElementById('gameDiv');     // optional
+
+    if (savedPoints) {
+      pointsDisplay.textContent = parseFloat(savedPoints).toFixed(9);
+
+      if (pointsDiv) pointsDiv.style.display = 'none';
+      if (gameDiv) gameDiv.style.display = 'block';
+    }
+  };
+  </script>
+</body>
+
+</html>
